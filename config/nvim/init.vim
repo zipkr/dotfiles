@@ -1,31 +1,70 @@
-call plug#begin('~/.vim/plugged')
+syntax enable
+set number
+set relativenumber
+set autoindent
+set cursorline
+set lazyredraw
 
-Plug 'fatih/vim-go', { 'tag': '*' }
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-Plug 'junegunn/fzf.vim'
-Plug 'neoclide/coc.nvim', { 'tag': '*', 'do': './install.sh' }
+let g:python_host_prog  = '/usr/local/bin/python3'
+let g:python3_host_prog = '/usr/local/bin/python3'
+
+call plug#begin()
 Plug 'bling/vim-airline'
-Plug 'tpope/vim-surround'
-Plug 'jiangmiao/auto-pairs'
-Plug 'scrooloose/nerdtree'
 Plug 'vim-airline/vim-airline-themes'
-Plug 'chriskempson/vim-tomorrow-theme'
-Plug 'chriskempson/base16-vim'
-Plug 'arcticicestudio/nord-vim'
-Plug 'morhetz/gruvbox'
-Plug 'fxn/vim-monochrome'
-Plug 'tpope/vim-fugitive'
 Plug 'scrooloose/nerdtree'
 Plug 'jremmen/vim-ripgrep'
-
+Plug 'jiangmiao/auto-pairs'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
+Plug 'solarnz/thrift.vim'
+Plug 'tpope/vim-fugitive'
+Plug 'pangloss/vim-javascript'
+Plug 'mxw/vim-jsx'
+Plug 'dylanaraps/wal.vim'
+Plug 'arcticicestudio/nord-vim'
+Plug 'triglav/vim-visual-increment'
+Plug 'ayu-theme/ayu-vim'
+Plug 'neoclide/coc.nvim'
+Plug 'junegunn/goyo.vim'
+Plug 'junegunn/limelight.vim'
+Plug 'morhetz/gruvbox'
+Plug 'trevordmiller/nova-vim'
+Plug 'fatih/vim-go'
 call plug#end()
 
-" if hidden is not set, TextEdit might fail.
-set hidden
+" extra syntax highlighting
+let g:go_highlight_operators = 1
+let g:go_highlight_functions = 1
+let g:go_highlight_function_parameters = 1
+let g:go_highlight_extra_types = 1
+let g:go_highlight_function_calls = 1
+let g:go_highlight_types = 1
+let g:go_highlight_fields = 1
+let g:go_highlight_variable_declarations = 1
+let g:go_highlight_variable_assignments = 1
 
-" Some servers have issues with backup files, see #649
-set nobackup
-set nowritebackup
+" disable vim-go :GoDef short cut (gd)
+" this is handled by LanguageClient [LC]
+let g:go_def_mapping_enabled = 0
+
+autocmd! User GoyoEnter Limelight
+autocmd! User GoyoLeave Limelight!
+
+let NERDTreeShowLineNumbers=1
+autocmd FileType nerdtree setlocal relativenumber
+nnoremap <C-O> :NERDTreeToggle<ENTER>
+
+vmap <Tab> >gv
+vmap <S-Tab> <gv
+
+inoremap jk <esc>
+
+let g:jsx_ext_required = 0
+
+autocmd BufNewFile,BufRead *.go setlocal noexpandtab tabstop=4 shiftwidth=4 
+au VimLeave *.go !gofmt -w %
+
+set tabstop=4 softtabstop=0 expandtab shiftwidth=4 smarttab
 
 " Better display for messages
 set cmdheight=2
@@ -52,52 +91,34 @@ function! s:check_back_space() abort
   return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
 
+" Use <c-space> to trigger completion.
+inoremap <silent><expr> <c-space> coc#refresh()
+
+" Use `[c` and `]c` to navigate diagnostics
+nmap <silent> [c <Plug>(coc-diagnostic-prev)
+nmap <silent> ]c <Plug>(coc-diagnostic-next)
+
 " Remap keys for gotos
 nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
 
-inoremap jk <Esc>
+" Use U to show documentation in preview window
+nnoremap <silent> U :call <SID>show_documentation()<CR>
 
-" Show all diagnostics
-nnoremap <silent> ge :CocList diagnostics<cr>
-
-" " Use K to show documentation in preview window
-" nnoremap <silent> K :call <SID>show_documentation()<CR>
-" 
-" function! s:show_documentation()
-"   if (index(['vim','help'], &filetype) >= 0)
-"     execute 'h '.expand('<cword>')
-"   else
-"     call CocAction('doHover')
-"   endif
-" endfunction
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
 
 " Highlight symbol under cursor on CursorHold
 autocmd CursorHold * silent call CocActionAsync('highlight')
 
-set relativenumber
-set number
-
-let g:go_highlight_operators = 1
-let g:go_highlight_functions = 1
-let g:go_highlight_function_parameters = 1
-let g:go_highlight_extra_types = 1
-let g:go_highlight_function_calls = 1
-let g:go_highlight_types = 1
-let g:go_highlight_fields = 1
-let g:go_highlight_variable_declarations = 1
-let g:go_highlight_variable_assignments = 1
-
-set tabstop=2 softtabstop=0 expandtab shiftwidth=2 smarttab
-
-let g:monochrome_italic_comments = 1
-let g:airline_theme='gruvbox'
-colo gruvbox
-
-" Remab visual tab & shift tab to indent and dedent
-vnoremap <Tab> >gv
-vnoremap <S-Tab> <gv
-
-map <C-o> :NERDTreeToggle<CR>
+set background=dark
+set termguicolors
+colorscheme nova
+let g:airline_theme='nova'
